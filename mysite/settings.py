@@ -161,7 +161,7 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-MEDIA_URL = "media/"  # 항상 / 로 끝나도록 설정
+MEDIA_URL = "/media/"  # 항상 / 로 끝나도록 설정
 MEDIA_ROOT = env.str("MEDIA_ROOT", default=BASE_DIR / "media")
 
 
