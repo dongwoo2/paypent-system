@@ -1,0 +1,42 @@
+{% extends "mall/base.html" %}
+{% load widget_tweaks %}
+
+{% block content %}
+    <h2>장바구니</h2>
+
+    <form action="" method="post" novalidate>
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>상품명</th>
+                    <th>수량</th>
+                    <th>삭제여부</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% csrf_token %}
+                {{ formset.management_form }}
+                {% for form in formset %}
+                    {% for field in form.hidden_fields %}{{ field }}{% endfor %}
+                    {% with form.instance as cart_product %}
+                        <tr>
+                            <td>{{ cart_product.product.name }}</td>
+
+                            <td>
+                                {% render_field form.quantity class+="form-control text-end" %}
+                                {{ form.quantity.errors }}
+                            </td>
+                            <td class="text-center">{% render_field form.DELETE class+="form-check-input" %}</td>
+                        </tr>
+                    {% endwith %}
+                {% endfor %}
+            </tbody>
+        </table>
+        <input type="submit" class="btn btn-primary" value="장바구니 업데이트" />
+    </form>
+
+
+    <div class="text-end">
+        <a href="{% url 'mall:order_new' %}" class="btn btn-primary">주문하기</a>
+    </div>
+{% endblock %}

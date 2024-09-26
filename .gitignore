@@ -1,10 +1,10 @@
 db.sqlite3
-__pycache__
-/mediafiles
-/staticfiles
+#__pycache__
+#/mediafiles
+#/staticfiles
 venv
-.vscode
-.idea
+#.vscode
+#.idea
 .env*
-*.pyc
-__pycache__/
+#*.pyc
+#g__pycache__/

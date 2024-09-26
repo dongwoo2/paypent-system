@@ -1,0 +1,107 @@
+{% load django_bootstrap5 %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport"
+              content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>장고 쇼핑몰</title>
+        {% bootstrap_css %}
+        {% bootstrap_javascript %}
+    </head>
+    <body>
+
+
+        <header class="p-3 mb-3 border-bottom">
+            <div class="container">
+                <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+                    <a href="{% url 'root' %}"
+                       class="d-flex align-items-center mb-2 mb-lg-0 text-dark text-decoration-none">장고 쇼핑몰</a>
+
+                    <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+                        <li>
+                            <a href="{% url 'mall:product_list' %}"
+                               class="nav-link px-2 link-secondary">몰</a>
+                        </li>
+                    </ul>
+
+                    <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3"
+                          role="search"
+                          action=""
+                          method="get">
+                        <input type="search"
+                               class="form-control"
+                               placeholder="Search..."
+                               aria-label="Search"
+                               name="query"
+                               value="{{ request.GET.query }}">
+                        {# 컨텍스트 프로세서 덕분에 템플릿에서 값에 직접 참조가 가능함 #}
+                    </form>
+
+                    {# 로그인 판별 객체 로그인 됐는지 아닌지 #}
+                    {% if not user.is_authenticated %}
+
+                        <ul class="nav">
+                            <li class="nav-item">
+                                <a href="{% url 'accounts:login' %}" class="nav-link link-dark px-2">로그인</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'accounts:signup' %}" class="nav-link link-dark px-2">회원가입</a>
+                            </li>
+                        </ul>
+                    {% else %}
+                        <div class="dropdown text-end">
+                            <a href="#"
+                               class="d-block link-dark text-decoration-none dropdown-toggle"
+                               data-bs-toggle="dropdown"
+                               aria-expanded="false">
+                                <img src="https://github.com/mdo.png"
+                                     alt="mdo"
+                                     width="32"
+                                     height="32"
+                                     class="rounded-circle">
+                            </a>
+                            <ul class="dropdown-menu text-small" style="">
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'mall:cart_detail' %}">장바구니</a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'mall:order_list' %}">주문목록</a>
+                                </li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'accounts:profile' %}">프로필</a>
+                                </li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'accounts:logout' %}">로그아웃</a>
+                                </li>
+                            </ul>
+                        </div>
+                    {% endif %}
+
+
+
+
+                </div>
+            </div>
+        </header>
+
+        <div class="container">
+            {% bootstrap_messages %} {# 이거 해야 메시지 보임 #}
+            {% block content %}{% endblock %}
+
+            <hr />
+            &copy; 2023. All rights reserved.
+        </div>
+        <script>window.csrf_token = "{{ csrf_token }}"</script>
+        <script src="{% static "utils/alert-modal.js"%}"></script>
+        {% block extra-script %}{% endblock %}
+    </body>
+</html>

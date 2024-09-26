@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./out-tsc/app"
+  },
+  "include": [
+    "src/buttongroup/defaultfunctionality/*.ts",
+    "polyfills.ts"
+  ],
+  "angularCompilerOptions": {
+    "enableIvy": true}
+}

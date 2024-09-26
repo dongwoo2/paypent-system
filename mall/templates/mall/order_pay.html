@@ -1,0 +1,28 @@
+{% extends "mall/base.html" %}
+
+
+
+{% block content %}<h2>결제</h2>{% endblock %}
+{% block extra-script %}
+    {{ payment_props|json_script:"payment-props" }}
+    <script src="https://cdn.iamport.kr/v1/iamport.js"></script>
+    <script>
+        (function() {
+            const IMP = window.IMP;
+            const next_url = "{{ next_url }}";
+            IMP.init("{{ portone_shop_id }}"); //init 호출하여 초기화
+
+            // 결제 JS코드에서는 #payment-props를 조회하여.
+            // .textContent으로 JSON 문자열을 읽어옵니다.
+            const json_string = document.querySelector("#payment-props").textContent;
+            // JSON 문자열을 객체로 변환하고 props로 저장합니다.
+            const props = JSON.parse(json_string);
+
+            // IMP.request_pay를 호출하여 결제 프로세스를 진행합니다.
+            // 첫 번째 인자로 props를 넣어주고, 두 번째 인자로 콜백함수를 지정합니다.
+            IMP.request_pay(props, function(response) {
+                location.href = next_url;
+            });
+        })();
+    </script>
+{% endblock %}

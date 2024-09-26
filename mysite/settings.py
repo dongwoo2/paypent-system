@@ -10,114 +10,170 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
+import os
 from pathlib import Path
+import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+env_path = BASE_DIR / ".env"
 
+env = environ.Env()
+if env_path.exists():  # 있으면 env_path 값을 읽을것임
+    # rt는 read+text 모드로 utf 인코딩으로 파일을 열어서 파일 객체를 넘겨줍니다
+    with env_path.open("rt", encoding="utf-8") as f:
+        env.read_env(f)
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-54ieq01an49tw@s76ff#x2(3yq*_g=+)8k^o-&cywbtv*qo4j2'
 
+SECRET_KEY = env.str(
+    "SECRET_KEY",
+    default="django-insecure-54ieq01an49tw@s76ff#x2(3yq*_g=+)8k^o-&cywbtv*qo4j2",
+)
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env.bool("DEBUG", default=True)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=[])
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.humanize",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    # third apps
+    "debug_toolbar",
+    "django_bootstrap5",
+    "sorl.thumbnail",
+    "widget_tweaks",
+    # local apps
+    "accounts",
+    "mall_test",
+    "mall",
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+ROOT_URLCONF = "mysite.urls"
 
-ROOT_URLCONF = 'mysite.urls'
+templates_dir = os.path.join(BASE_DIR, "templates")  # 내가 생성한 템플릿 위치
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [templates_dir],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "string_if_invalid": "UnKnown Value!",
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'mysite.wsgi.application'
+WSGI_APPLICATION = "mysite.wsgi.application"
 
 
 # Database
-# https://docs.djangoproject.com/en/4.1/ref/settings/#databases
+# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
+# f-string 문법 dq.sqlite3 파일 위치를 동적으로 계산
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    "default": env.db("DATABASE_URL", default=f"sqlite:///{BASE_DIR / 'db.sqlite3'})"),
 }
 
 
 # Password validation
-# https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
+# https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
+AUTH_USER_MODEL = "accounts.User"  # 이거 설정해야 내가 설정한 커스텀 유저모델로 마이그레이션됨 안하면 기본 USER로 설정됨
+
 
 # Internationalization
-# https://docs.djangoproject.com/en/4.1/topics/i18n/
+# https://docs.djangoproject.com/en/3.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = env.str("LANGUAGE_CODE", default="ko-kr")
 
-TIME_ZONE = 'UTC'
-
+TIME_ZONE = "UTC"
 USE_I18N = True
-
+USE_L10N = True
 USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.1/howto/static-files/
+# https://docs.djangoproject.com/en/3.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = "/static/"
+STATIC_ROOT = env.str("STATIC_ROOT", default=BASE_DIR / "staticfiles")
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
 
 # Default primary key field type
-# https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
+# https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+MEDIA_URL = "media/"  # 항상 / 로 끝나도록 설정
+MEDIA_ROOT = env.str("MEDIA_ROOT", default=BASE_DIR / "media")
+
+
+STRIPE_SECRET_KEY = env.str(
+    "STRIPE_SECRET_KEY",
+    default="",
+)
+
+STRIPE_PUBLISHABLE_KEY = env.str(
+    "STRIPE_SECRET_KEY",
+    default="",
+)
+
+
+# django-debug-toolbar 환경변수가 개인정보등 민감한 정보가 나오기에 화이트 리스트로 지정한 ip만 볼 수 있게 설정
+INTERNAL_IPS = env.list("INTERNAL_IPS", default=["127.0.0.1"])
+
+# 포트원
+PORTONE_SHOP_ID = env.str("PORTONE_SHOP_ID", default="")
+PORTONE_API_KEY = env.str("PORTONE_API_KEY", default="")
+PORTONE_API_SECRET = env.str("PORTONE_API_SECRET", default="")
+PORTONE_PG_PROVIDER = env.str("PORTONE_PG_PROVIDER", default="")
+
+PORTONE_PG = PORTONE_PG_PROVIDER
+
+LOGIN_URL = "accounts:login"
+LOGOUT_REDIRECT_URL = "accounts:login"

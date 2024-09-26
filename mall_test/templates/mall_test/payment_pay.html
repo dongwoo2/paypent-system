@@ -1,0 +1,26 @@
+{% extends "mall_test/base.html" %}
+
+{% block content %}
+    <h2>결제하기</h2>
+
+    {{ payment_props|json_script:"payment-props" }} <!--페이지 소스 보면 얘 아이디 나와있음 -->
+    <script>window.PAYMENT_CHECK_URL = "{{ payment_check_url }}";</script>
+    <script src="https://cdn.iamport.kr/v1/iamport.js"></script>
+    <script>
+        (function (){
+            const IMP = window.IMP;
+            const code = "{{portone_shop_id}}";
+            IMP.init(code);
+
+            const json_string = document.querySelector("#payment-props").textContent;<!--값 가져와서-->
+            const props = JSON.parse(json_string) // 자바스크립트 객체화를 시켜화하기 때문에 JSON 파싱을 하면 이값이 props object가 됨
+            const merchant_uid = "merchant_" + new Date().getTime();
+
+            console.log(props)
+
+            IMP.request_pay(props, function(response){
+                location.href = window.PAYMENT_CHECK_URL;
+            }); // 유저가 결제를 완료하거나 취소했을 때. 이 콜백함수가 호출됩니다.
+        })();
+    </script>
+{% endblock %}
