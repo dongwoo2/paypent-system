@@ -99,7 +99,18 @@ WSGI_APPLICATION = "mysite.wsgi.application"
 
 # f-string 문법 dq.sqlite3 파일 위치를 동적으로 계산
 DATABASES = {
-    "default": env.db("DATABASE_URL", default=f"sqlite:///{BASE_DIR / 'db.sqlite3'})"),
+    "default": {
+        "ENGINE": "django.db.backends.mysql",
+        "HOST": env("MYSQL_HOST", default="localhost"),
+        "NAME": "payment",
+        "USER": env("MYSQL_USER_NAME", default="default_user"),
+        "PASSWORD": env("MYSQL_PASSWORD", default="default_password"),
+        "PORT": "3306",
+        "OPTIONS": {
+            "charset": "utf8mb4",
+            "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
+        },
+    }
 }
 
 
